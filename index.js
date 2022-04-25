@@ -6,8 +6,9 @@ const ballDiameter = 20
 const boardWidth = 560
 const boardHeight = 300
 let timerId
-let xDirection = 2
+let xDirection = -2
 let yDirection = 2
+let score = 0
 
 const userStart = [230, 10]
 let currentPosition = userStart
@@ -60,8 +61,7 @@ addBlocks()
 //add user
 const user = document.createElement('div')
 user.classList.add('user')
-user.style.left = currentPosition[0] + 'px'
-user.style.bottom = currentPosition[1] + 'px'
+drawUser()
 grid.appendChild(user)
 
 
@@ -117,10 +117,43 @@ timerId = setInterval(moveBall, 50)
 
 // check for collisions 
 function checkForCollisions() {
+    // check for block collision 
+        for (let i = 0; i < blocks.length; i++) {
+            if (
+                (ballCurrentPosition[0] > blocks[i].bottomLeft[0] && ballCurrentPosition[0] < blocks[i].bottomRight[0]) && ((ballCurrentPosition[1] + ballDiameter) > blocks[i].bottomLeft[1] && ballCurrentPosition[1] < blocks[i].topLeft[1])
+            ) {
+                const allBlocks = Array.from(document.querySelectorAll('.block'))
+                console.log(allBlocks)
+               allBlocks[i].classList.remove('block') 
+               blocks.splice(i, 1)
+               changeDirection()
+               score++
+               scoreDisplay.innerHTML = score
 
-    
-    if (ballCurrentPosition[0] >= (boardWidth - ballDiameter) || ballCurrentPosition[1] >= (boardHeight - ballDiameter) || ballCurrentPosition[0] <= 0
+
+               if (blocks.lenght === 0) {
+                   scoreDisplay.innerHTML = 'You win'
+                   clearInterval(timerId)
+                   document.removeEventListener('keydown' , moveUser)
+               }
+            }
+                
+        }
+
+
+
+
+        // check for wall collisions 
+    if (ballCurrentPosition[0] >= (boardWidth - ballDiameter) || ballCurrentPosition[0] <= 0 || ballCurrentPosition[1] >= (boardHeight - ballDiameter)
     ) {
+        changeDirection()
+    }
+
+    // check for user collision 
+
+    if (
+        (ballCurrentPosition[0] > currentPosition[0] && ballCurrentPosition[0] < currentPosition[0] + blockWidth) && (ballCurrentPosition[1] > currentPosition[1] && ballCurrentPosition[1] < currentPosition[1] + blockHeight)
+        ) {
         changeDirection()
     }
 
@@ -146,8 +179,29 @@ function changeDirection() {
         yDirection = 2
         return
     }
-    if (xDirection === -2 && yDirection === -2) {
+    if (xDirection === -2 && yDirection === 2) {
         xDirection = 2
         return
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
